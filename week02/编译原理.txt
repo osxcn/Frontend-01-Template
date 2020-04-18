@@ -1,0 +1,60 @@
+# 0型 无限制文法 ? ::= ?
+
+<a> <b> ::= "c" <d>
+
+# 1型 上下文相关文法 ? <A> ? ::= ? <B> ?
+
+"a" <b> "c" ::= "a" "x" "c"
+
+"```四则运算" <LogicalExpression> "```" = "```四则运算"
+  (<AdditiveExpression> 
+  | <LogicalExpression> "||" <AdditiveExpression>
+  | <LogicalExpression> "&&" <AdditiveExpression>)
+  "```"
+
+
+# 2型 上下文无关文法 <A> ::= ?
+
+<Number> = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<DecimalNumber> = "0" | (("1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9") <Number>* )
+
+<PrimaryExpression> = <DecimalNumber>
+  | "(" <LogicalExpression> ")"
+
+<MultiplicativeExpression> = <PrimaryExpression> 
+  | <MultiplicativeExpression> "*" <PrimaryExpression>
+  | <MultiplicativeExpression> "/" <PrimaryExpression>
+
+<AdditiveExpression> = <MultiplicativeExpression> 
+  | <AdditiveExpression> "+" <MultiplicativeExpression>
+  | <AdditiveExpression> "-" <MultiplicativeExpression>
+
+<LogicalExpression> = <AdditiveExpression> 
+  | <LogicalExpression> "||" <AdditiveExpression>
+  | <LogicalExpression> "&&" <AdditiveExpression>
+
+<ExponentiationExpression> = <MultiplicativeExpression>
+  | <MultiplicativeExpression> "**" <ExponentiationExpression>
+
+
+# 3型 正则文法
+<A> ::= <A>? 左递归
+<A> ::= ?<A> x 不行 这种只能算2型
+
+<DecimalNumber> = /0|[1-9][0-9]*/
+
+
+
+
+
+# 类型系统
+* 动态类型系统与静态类型系统
+* 强类型与弱类型
+  - 有隐式转换是弱类型
+* 复合类型
+  - 结构体
+  - 函数签名
+* 子类型
+  - 逆变/协变
+  凡是能用Array<Parent>的地方，都能用Array<Child>
+  凡是能用Function<Parent>的地方，都能用Function<Child>
