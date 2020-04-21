@@ -1,0 +1,14 @@
+<script>
+
+  var a = 0.1;
+  var b = 0.2;
+  
+  const intArr = new Uint8Array(8);
+  const memory = new Float32Array(intArr.buffer);
+  intArr[0] = 0b00000100;
+  intArr[1] = 0b00000000;
+
+
+  console.log(intArr);
+  console.log(memory);
+</script>
