@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number validate</title>
+</head>
+<body>
+  <label for="numberStr">请输入需要验证的数字：</label>
+  <input type="text" id="numberStr">
+  <button id="validate-btn">validate</button>
+  <br>
+  <label>验证结果：</label>
+  <span id="res"></span>
+  <br>
+  <label>Number转换结果：</label>
+  <span id="toNumber"></span>
+
+  <script>
+    const $numberStr = document.getElementById('numberStr');
+    const $btn = document.getElementById('validate-btn');
+    const $res = document.getElementById('res');
+    const $toNumber = document.getElementById('toNumber');
+    $btn.onclick = function() {
+      const numberStr = $numberStr.value;
+      let res = false;
+      // 二进制|八进制|十六进制|十进制
+      
+      if (/^(0(b[0-1]+|o[0-7]+|x[0-9A-F]+)|[+-]?(\d+(\.\d*)?|\d*\.\d+)(e[+-]?\d+)?)$/i.test(numberStr)) res = true;
+      $res.innerText = res;
+      $toNumber.innerText = Number(numberStr);
+    }
+  </script>
+</body>
+</html>
