@@ -4,32 +4,69 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Number validate</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <!-- 引入组件库 -->
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 </head>
 <body>
-  <label for="numberStr">请输入需要验证的数字：</label>
-  <input type="text" id="numberStr">
-  <button id="validate-btn">validate</button>
-  <br>
-  <label>验证结果：</label>
-  <span id="res"></span>
-  <br>
-  <label>Number转换结果：</label>
-  <span id="toNumber"></span>
+  <div id="app">
+    <el-tabs>
+      <el-tab-pane label="校验">
+        <el-button size="medium" @click="validate">validate</el-button>
+        <el-table :data="numsInfo" :max-height="600">
+          <el-table-column prop="type" label="进制" width="160" align="center"></el-table-column>
+          <el-table-column prop="num" label="字面量" width="200" align="right"></el-table-column>
+          <el-table-column prop="validated" label="校验结果" width="160" align="center"></el-table-column>
+          <el-table-column prop="number" label="实际转换结果" width="200" align="right"></el-table-column>
+        </el-table>
+      </el-tab-pane>
+      <el-tab-pane label="正则解析">
+        
+      </el-tab-pane>
+    </el-tabs>
+  </div>
 
   <script>
-    const $numberStr = document.getElementById('numberStr');
-    const $btn = document.getElementById('validate-btn');
-    const $res = document.getElementById('res');
-    const $toNumber = document.getElementById('toNumber');
-    $btn.onclick = function() {
-      const numberStr = $numberStr.value;
-      let res = false;
-      // 二进制|八进制|十六进制|十进制
-      
-      if (/^(0(b[0-1]+|o[0-7]+|x[0-9A-F]+)|[+-]?(\d+(\.\d*)?|\d*\.\d+)(e[+-]?\d+)?)$/i.test(numberStr)) res = true;
-      $res.innerText = res;
-      $toNumber.innerText = Number(numberStr);
-    }
+    new Vue({
+      el: '#app',
+      data() {
+        return {
+          numsInfo: [
+            { type: '十进制', num: '+2', validated: '-', number: '-' },
+            { type: '十进制', num: '+2.', validated: '-', number: '-' },
+            { type: '十进制', num: '-2', validated: '-', number: '-' },
+            { type: '十进制', num: '.2', validated: '-', number: '-' },
+            { type: '十进制', num: '.2e4', validated: '-', number: '-' },
+            { type: '十进制', num: '.34e-1', validated: '-', number: '-' },
+            { type: '十进制', num: '2.1e+3', validated: '-', number: '-' },
+            { type: '十进制', num: '-2.e3', validated: '-', number: '-' },
+            { type: '十进制', num: '023', validated: '-', number: '-' },
+            { type: '十进制', num: '.', validated: '-', number: '-' },
+            { type: '十进制', num: '.1e', validated: '-', number: '-' },
+            { type: '二进制', num: '0b0101110', validated: '-', number: '-' },
+            { type: '二进制', num: '0B010010', validated: '-', number: '-' },
+            { type: '二进制', num: '0b0211', validated: '-', number: '-' },
+            { type: '八进制', num: '0o0012', validated: '-', number: '-' },
+            { type: '八进制', num: '0O213', validated: '-', number: '-' },
+            { type: '八进制', num: '0o758', validated: '-', number: '-' },
+            { type: '十六进制', num: '0xab', validated: '-', number: '-' },
+            { type: '十六进制', num: '0X123A', validated: '-', number: '-' },
+            { type: '十六进制', num: '0xASA', validated: '-', number: '-' },
+          ]
+        };
+      },
+      methods: {
+        validate() {
+          this.numsInfo.forEach((info) => {
+            // 二进制|八进制|十六进制|十进制
+            info.validated = /^(0(b[0-1]+|o[0-7]+|x[0-9A-F]+)|[+-]?(\d+(\.\d*)?|\d*\.\d+)(e[+-]?\d+)?)$/i.test(info.num) ? 'true' : 'false';
+            info.number = Number(info.num);
+          });
+        }
+      },
+    });
   </script>
 </body>
 </html>
