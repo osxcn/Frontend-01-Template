@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UTF-8 Encoding</title>
+</head>
+<body>
+  结果请在控制台查看。
+  <script>
+    function char2utf8buffer(char) {
+      // 获取字符的二进制
+      const charCode = char.codePointAt();
+      const binary = charCode.toString(2);
+      const len = binary.length;
+      // 如果二进制长度小于8，前置补零到8位
+      if (len < 8) {
+        return binary.padStart(8, 0);
+      }
+      // doc: http://www.ruanyifeng.com/blog/2007/10/ascii_unicode_and_utf-8.html
+      /*
+      Unicode符号范围     |        UTF-8编码方式
+      (十六进制)        |              （二进制）
+      ----------------------+---------------------------------------------
+      0000 0000-0000 007F | 0xxxxxxx
+      0000 0080-0000 07FF | 110xxxxx 10xxxxxx
+      0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx
+      0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+      0020 0000-03FF FFFF | 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+      0400 0000-7FFF FFFF | 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+      */
+      const header = ['0', '110', '1110', '11110', '111110', '1111110'];
+      const buffers = [];
+      const quotient = Math.floor(binary.length / 6); // 10开头的个数
+      let index = len - 6 * quotient;
+      const first = binary.slice(0, index);
+      buffers[0] = header[quotient] + first.padStart(8 - header[quotient].length, '0');
+      for (let i = 1; i <= quotient; i++) {
+        buffers[i] = '10' + binary.slice(i * index, i * index + 6);
+      }
+      /* 日志输出 */
+      console.log('>>>>>>>>>>> begin >>>>>>>>>');
+      console.log(`当前输出的字符是：${char}`);
+      console.log(`charCode：${charCode}`);
+      console.log(`binary: ${binary}`);
+      console.log(`buffer: ${buffers.join('|')}`);
+      console.log('>>>>>>>>>>> end >>>>>>>>>');
+      /* 日志输出 */
+
+      return buffers.join('|');
+    }
+    function UTF8_Encoding(str) {
+      return Array.from(str).map(char => char2utf8buffer(char));
+    }
+
+    UTF8_Encoding('\u{2F804}\uD87E\uDC04\u0041');
+  </script>
+</body>
+</html>

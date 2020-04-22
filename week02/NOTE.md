@@ -3,7 +3,7 @@
 ## 写一个正则表达式 匹配所有 Number 直接量
 [Number validate](work/number.html)
 
-## 写一个 UTF-8 Encoding 的函数（未完成）
+## 写一个 UTF-8 Encoding 的函数
 [UTF-8 Encoding](work/utf8-encoding.html)
 
 ## 写一个正则表达式，匹配所有的字符串直接量，单引号和双引号（未完成）
