@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,11 +9,45 @@
   <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
   <!-- 引入组件库 -->
   <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+  <style>
+    em {
+      font-style: normal;
+      background-color: #f9f9f9;
+      border: 1px solid #e8e8e8;
+      border-radius: 2px 2px;
+      padding: 0 5px;
+      margin: 2px 5px;
+    }
+    em.regexp {
+      display: block;
+      padding: 8px 15px;
+      font-size: 13px;
+    }
+
+    span, p {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+
+    p em, span em {
+      display: inline-block;
+      margin: 2px 5px;
+    }
+    
+    .el-scrollbar {
+      height: 90vh;
+    }
+
+    .el-scrollbar .el-scrollbar__wrap {
+      overflow-x: hidden;
+    }
+  </style>
 </head>
 <body>
   <div id="app">
-    <el-tabs>
-      <el-tab-pane label="校验">
+    <el-tabs v-model="activeName">
+      <el-tab-pane label="校验" name="validate">
         <el-button size="medium" @click="validate">validate</el-button>
         <el-table :data="numsInfo" :max-height="600">
           <el-table-column prop="type" label="进制" width="160" align="center"></el-table-column>
@@ -22,8 +56,82 @@
           <el-table-column prop="number" label="实际转换结果" width="200" align="right"></el-table-column>
         </el-table>
       </el-tab-pane>
-      <el-tab-pane label="正则解析">
-        
+      <el-tab-pane label="正则解析" name="analyze">
+        <el-scrollbar>
+          <p>将根据进制进行解析。数值包含以下几个进制：二进制、八进制、十进制、十六进制</p>
+          <br>
+          <el-card header="二进制">
+            <p>
+              二进制以<strong>0b</strong>或<strong>0B</strong>开头，后跟（<strong>0</strong>|<strong>1</strong>）两个值的其中之一或全部，个数不限。
+            </p>
+            <p>因此，其写法如下:</p>
+            <em class="regexp">/^0b[01]+%/i</em>
+          </el-card>
+          <el-card header="八进制">
+            <p>
+              八进制以<strong>0o</strong>或<strong>0O</strong>开头，后跟<strong>0~7</strong>中的其一或全部，个数不限。
+            </p>
+            <p>因此，其写法如下:</p>
+            <em class="regexp">/^0o[0-7]+%/i</em>
+          </el-card>
+          <el-card header="十六进制">
+            <p>
+              十六进制以<strong>0x</strong>或<strong>0X</strong>开头，后跟<strong>0~9</strong>以及<strong>A~F</strong>中的其一或全部，个数不限。
+            </p>
+            <p>因此，其写法如下:</p>
+            <em class="regexp">/^0x[0-9A-F]+%/i</em>
+            <p>其中<em>0-9</em>又可用<em>\d</em>进行表示，因此，其可简写为：</p>
+            <em class="regexp">/^0x[\dA-F]+%/i</em>
+          </el-card>
+          <el-card header="十进制">
+            <p>十进制规则如下：</p>
+            <p>整数(Integer) . 小数(DecimalDigits) 指数(ExponentPart)</p>
+            <p>下面进行拆解。</p>
+            <p>
+              <strong>首先，整数分为正负。</strong>
+              如果为正数，可能有一个<em>+</em>号，也可能没有；如果为负，则有一个<em>-</em>号。<em>+-</em>两者只能同时存在一个。因此，其正则表现为：<em>[+-]?</em>。
+            </p>
+            <p>
+              <strong>其次，整数的规则(不考虑符号)。</strong>
+              整数第一位可为0或1-9的任意一位，后续跟0-9中的任意一位，个数不限。因此，其正则表现可为：<em>0|[1-9]\d*</em>。</p>
+            <p>然而，实际情况中，Number可解析前置任意个0的字面量。因此，正则可简化为<em>\d*</em>。</p>
+            <p>
+              <strong>接着，是整数(无符号)与小数的整合。</strong>
+              其可能的结合有以下几种：
+              <ul>
+                <li>1. 整数.：正则表现为：<em>\d+.</em></li>
+                <li>2. .小数：正则表现为：<em>.\d+</em></li>
+                <li>3. 整数.小数：正则表现为：<em>\d+.\d+</em></li>
+              </ul>
+              <span>1与3整合，其正则可表现为: <em>\d+(\.\d*)?</em></span><br>
+              <span>2与3整合，其正则可表现为: <em>\d*\.\d+</em></span><br>
+              <span>全部整合后，其正则可表现为：<em>\d+(\.\d*)?|\d*\.\d+</em></span>
+            </p>
+            <p>
+              <strong>然后，是指数规则。</strong>
+              首先是一个<em>e</em>，代表指数，大小写均可。然后跟上一个整数，可包含正负符号。所以其正则可表现为：<em>e[+-]?\d+</em>
+            </p>
+            <p>
+              <strong>最后将其整合，得到最终正则：</strong>
+              <em class="regexp">
+                /^[+-]?(\d+(\.\d*)?|\d*\.\d+)(e[+-]?\d+)?$/
+              </em>
+            </p>
+          </el-card>
+          <el-card style="margin-top: 10px;">
+            <p>二进制、八进制、十六进制的整合</p>
+            <p>
+              根据二进制、八进制、十六进制的整合的正则，可以整合如下：
+            </p>
+            <em class="regexp">
+              /^0(b[0-1]+|o[0-7]+|x[\dA-F]+)%/i
+            </em>
+            <p>然后将其与十进制进行整合，得到最终正则：</p>
+            <em class="regexp">
+              /^(0(b[0-1]+|o[0-7]+|x[\dA-F]+)|[+-]?(\d+(\.\d*)?|\d*\.\d+)(e[+-]?\d+)?)$/i
+            </em>
+          </el-card>
+        </el-scrollbar>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -33,6 +141,7 @@
       el: '#app',
       data() {
         return {
+          activeName: 'analyze',
           numsInfo: [
             { type: '十进制', num: '+2', validated: '-', number: '-' },
             { type: '十进制', num: '+2.', validated: '-', number: '-' },
@@ -45,6 +154,7 @@
             { type: '十进制', num: '023', validated: '-', number: '-' },
             { type: '十进制', num: '.', validated: '-', number: '-' },
             { type: '十进制', num: '.1e', validated: '-', number: '-' },
+            { type: '十进制', num: '.34e1.1', validated: '-', number: '-' },
             { type: '二进制', num: '0b0101110', validated: '-', number: '-' },
             { type: '二进制', num: '0B010010', validated: '-', number: '-' },
             { type: '二进制', num: '0b0211', validated: '-', number: '-' },
