@@ -1,3 +1,8 @@
+/**
+ * 字符串转数值
+ * @param {string} string 待转换为数值的字符串
+ * @param {number|undefined} hex 进制
+ */
 function convertStringToNumber(string, hex) {
   // 进制判断
   if (arguments.length < 2 || typeof hex !== 'number') {
